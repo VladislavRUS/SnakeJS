@@ -1,0 +1,286 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+
+    <body>
+        <table id="field"></table>
+        <div id="score" style="font-size: 25px">
+            Your score is: 0
+        </div>
+    </body>
+    <script>
+        window.addEventListener('keydown', handleEvent);
+        var tableSize = 10;
+        for(var i = 0; i < tableSize; i++){
+            document.createElement("tr").setAttribute('id', 'tr'+i);
+            var tr = document.createElement("tr");
+            tr.setAttribute("id", 'tr' + i);
+            document.getElementById("field").appendChild(tr);
+            for(var j = 0; j < tableSize; j++){
+                var td = document.createElement("td");
+                td.setAttribute("id", 'td'+i+','+j);
+                td.style = "width: 35px; height: 35px; border: 1px solid black; background-color: red";
+                document.getElementById('tr' + i).appendChild(td);
+            }
+        }
+        
+        var direction = {
+            left:  37,
+            up:    38,
+            right: 39,
+            down:  40
+        }
+        
+        var snake = new Array();
+        snake[0] = "2,3"; 
+        snake[1] = "2,2"; 
+        snake[2] = "2,1"; 
+        snake.direction = direction.right;
+        
+        var prevDirection = direction.right;
+        function handleEvent(e){
+            switch(e.keyCode){
+                case 37:{
+                    if(prevDirection !== direction.right){
+                        snake.direction = direction.left;
+                    }
+                    break;
+                }
+                case 38:{
+                    if(prevDirection !== direction.down){
+                        snake.direction = direction.up;
+                    }
+                    break;
+                }
+                case 39:{
+                    if(prevDirection !== direction.left){
+                        snake.direction = direction.right;
+                    }
+                    break;
+                }   
+                case 40:{
+                    if(prevDirection !== direction.up){
+                        snake.direction = direction.down;
+                    }
+                    break;
+                }     
+                default:{
+                    break;
+                }
+            }
+        }
+        
+        var currentScore;
+        var wasScored = false;
+        var scoreToShow = 0;
+        function spawnScore(){
+            var i = Math.floor(Math.random()*(tableSize-1));
+            var j = Math.floor(Math.random()*(tableSize-1));
+            var element = i+','+j;
+            if(!snake.contains(element)){
+                currentScore = element;
+                var elId = 'td'+element;
+                document.getElementById(elId).style.backgroundColor = "green";
+            }
+            else{
+                spawnScore();
+            }
+            return;
+        }
+        
+        function move(){
+            switch(snake.direction){
+                case direction.left:{
+                    var headCoordinates = snake[0].split(',');
+                    var newSecondCoordinate = parseInt(headCoordinates[1]);
+                    newSecondCoordinate--;
+                    if(newSecondCoordinate < 0){
+                        alert('You lose!');
+                        restart();
+                    }
+                    else{
+                        var newLeftCoord = headCoordinates[0]+','+newSecondCoordinate;
+                        if(snake.contains(newLeftCoord)){
+                            alert('You lose!');
+                            restart();
+                        }
+                        else{
+                            var last = snake.pop();
+                            snake.unshift(newLeftCoord);
+                            var tdId = 'td'+last;
+                            if(snake[0] === currentScore){
+                                snake.push(last);
+                                wasScored = true;
+                            }
+                            else{
+                                document.getElementById(tdId).style.backgroundColor = "red";
+                            }
+                            if(wasScored){
+                                scoreToShow++;
+                                spawnScore();
+                                wasScored = false;
+                                document.getElementById("score").innerHTML = "Your score is: " + scoreToShow;
+                            }
+                            snake.direction = direction.left;
+                            prevDirection = direction.left;
+                        }
+                    }
+                    break;
+                }
+                case direction.up:{
+                    var headCoordinates = snake[0].split(',');
+                    var newFirstCoordinate = parseInt(headCoordinates[0]);
+                    newFirstCoordinate--;
+                    if(newFirstCoordinate < 0){
+                        alert('You lose!');
+                        restart();
+                    }
+                    else{
+                        var newUpCoord = newFirstCoordinate + ','+headCoordinates[1];
+                        if(snake.contains(newUpCoord)){
+                            alert('You lose!');
+                            restart();
+                        }
+                        else{
+                            var last = snake.pop();
+                            snake.unshift(newUpCoord);
+                            var tdId = 'td'+last;
+                            if(snake[0] === currentScore){
+                                snake.push(last);
+                                wasScored = true;
+                            }
+                            else{
+                                document.getElementById(tdId).style.backgroundColor = "red";
+                            }
+                            if(wasScored){
+                                scoreToShow++;
+                                spawnScore();
+                                wasScored = false;
+                                document.getElementById("score").innerHTML = "Your score is: " + scoreToShow;
+                            }
+                            snake.direction = direction.up;
+                            prevDirection = direction.up;
+                        }
+                    }
+                    break;
+                }
+                case direction.right:{
+                    var headCoordinates = snake[0].split(',');
+                    var newSecondCoordinate = parseInt(headCoordinates[1]);
+                    newSecondCoordinate++;
+                    if(newSecondCoordinate > tableSize-1){
+                        alert('You lose!');
+                        restart();
+                    }
+                    else{
+                        var newRightCoord = headCoordinates[0]+','+newSecondCoordinate;
+                        if(snake.contains(newRightCoord)){
+                            alert('You lose!');
+                            restart();
+                        }
+                        else{
+                            var last = snake.pop();
+                            snake.unshift(newRightCoord);
+                            var tdId = 'td'+last;
+                            if(snake[0] === currentScore){
+                                snake.push(last);
+                                wasScored = true;
+                            }
+                            else{
+                                document.getElementById(tdId).style.backgroundColor = "red";    
+                            }
+                            if(wasScored){
+                                scoreToShow++;
+                                spawnScore();
+                                wasScored = false;
+                                document.getElementById("score").innerHTML = "Your score is: " + scoreToShow;
+                            }
+                            snake.direction = direction.right;
+                            prevDirection = direction.right;
+                        }
+                    }
+                    break;
+                }
+                case direction.down:{
+                    var headCoordinates = snake[0].split(',');
+                    var newFirstCoordinate = parseInt(headCoordinates[0]);
+                    newFirstCoordinate++;
+                    if(newFirstCoordinate > tableSize-1){
+                        alert('You lose!');
+                        restart();
+                    }
+                    else{
+                        var newDownCoord = newFirstCoordinate + ','+headCoordinates[1];
+                        if(snake.contains(newDownCoord)){
+                            alert('You lose!');
+                            restart();
+                        }
+                        else{
+                            var last = snake.pop();
+                            snake.unshift(newDownCoord);
+                            var tdId = 'td'+last;
+                            if(snake[0] === currentScore){
+                                snake.push(last);
+                                wasScored = true;
+                            }
+                            else{
+                                document.getElementById(tdId).style.backgroundColor = "red";
+                            }
+                            if(wasScored){
+                                scoreToShow++;
+                                spawnScore();
+                                wasScored = false;
+                                document.getElementById("score").innerHTML = "Your score is: " + scoreToShow;
+                            }
+                            snake.direction = direction.down;
+                            prevDirection = direction.down;
+                        }
+                    }
+                    break;
+                }
+            }
+            
+        }
+        
+        Array.prototype.contains = function(el){
+            return this.indexOf(el) > -1;
+        }
+        
+        function draw(){
+            for(var i = 0; i < tableSize; i++){
+                for(var j = 0; j < tableSize; j++){
+                    var el = i+','+j;
+                    var tdId = 'td'+el;
+                    if(snake.contains(el)){
+                        document.getElementById(tdId).style.backgroundColor = "yellow";
+                    }
+                }
+            }
+        }
+        
+        function restart(){
+            for(var i = 0; i < tableSize; i++){
+                for(var j = 0; j < tableSize;j++){
+                    var id = 'td'+i+','+j;
+                    document.getElementById(id).style.backgroundColor = "red";
+                }
+            }
+            currentScore = "";
+            wasSpawned = false;
+            snake = new Array();
+            snake[0] = "2,3";
+            snake[1] = "2,2";
+            snake[2] = "2,1";
+            snake.direction = direction.right;
+            var prevDirection = direction.right;
+            document.getElementById("score").innerHTML = "Your score is: 0";
+            scoreToShow = 0;
+            spawnScore();
+        }
+        
+        spawnScore();
+        setInterval(draw, 50)
+        setInterval(move, 100);
+    </script>
+</html>
